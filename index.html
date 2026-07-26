@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Ekskul SMKN 10 Semarang</title>
+
+<!-- PWA: Android -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#173a68">
+
+<!-- PWA: iOS (Safari tidak membaca manifest.json, butuh tag terpisah) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ekskul SMKN 10">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<style>
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#0f2747; font-family:-apple-system,'Segoe UI',Roboto,sans-serif; }
+  #loading {
+    position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#173a68 0%,#0f2747 100%); color:#fff; z-index:10; transition:opacity .3s ease;
+  }
+  #loading img { width:72px; height:72px; border-radius:18px; margin-bottom:16px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  #loading .spinner { width:28px; height:28px; border:3px solid rgba(255,255,255,.25); border-top-color:#f2a541; border-radius:50%; animation:spin .8s linear infinite; margin-top:18px; }
+  #loading p { font-size:13px; opacity:.85; margin-top:10px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #appFrame { position:fixed; inset:0; width:100%; height:100%; border:none; }
+  #offline {
+    position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+    background:#fbfaf7; color:#1e2733; text-align:center; padding:24px; z-index:20;
+  }
+  #offline button { margin-top:16px; padding:10px 20px; background:#173a68; color:#fff; border:none; border-radius:8px; font-size:14px; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <img src="icon-192.png" alt="Logo">
+  <div style="font-weight:600; font-size:15px;">Ekstrakurikuler SMK Negeri 10 Semarang</div>
+  <div class="spinner"></div>
+  <p>Memuat aplikasi...</p>
+</div>
+
+<div id="offline">
+  <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Tidak ada koneksi internet</div>
+  <div style="font-size:13px; color:#5b6472;">Periksa jaringan Anda, lalu coba lagi.</div>
+  <button onclick="location.reload()">Coba Lagi</button>
+</div>
+
+<iframe id="appFrame" title="Aplikasi Ekstrakurikuler" allow="camera; geolocation"></iframe>
+
+<script>
+  // ==========================================================================
+  // GANTI URL DI BAWAH INI dengan URL deployment Web App Anda (harus diakhiri /exec)
+  // Ambil dari: Apps Script editor -> Deploy -> Manage deployments
+  // ==========================================================================
+  const EXEC_URL = 'https://script.google.com/macros/s/AKfycbyolgI_Jc6AcHryVVET74NdPLt4qY75gjkeY8ZeZ1wccQbBC1rcIT_VHrtD1GeHQf9H4g/exec';
+
+  const frame = document.getElementById('appFrame');
+  const loading = document.getElementById('loading');
+  const offlineEl = document.getElementById('offline');
+
+  function muatAplikasi() {
+    if (!navigator.onLine) {
+      loading.style.display = 'none';
+      offlineEl.style.display = 'flex';
+      return;
+    }
+    frame.src = EXEC_URL;
+  }
+
+  frame.addEventListener('load', function () {
+    loading.style.opacity = '0';
+    setTimeout(function () { loading.style.display = 'none'; }, 300);
+  });
+
+  window.addEventListener('online', function () {
+    if (offlineEl.style.display === 'flex') { offlineEl.style.display = 'none'; loading.style.display = 'flex'; loading.style.opacity = '1'; muatAplikasi(); }
+  });
+
+  muatAplikasi();
+</script>
+</body>
+</html>
